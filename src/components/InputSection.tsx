@@ -97,7 +97,7 @@ export default function InputSection({ onProcess, isLoading }: InputSectionProps
                 <Upload size={48} />
               </div>
               <p style={{ fontSize: '1.1rem', fontWeight: 500 }}>Click or drag audio file here</p>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>MP3, WAV, M4A up to 25MB</p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>MP3, WAV, M4A up to 500MB</p>
             </>
           )}
         </div>

@@ -19,16 +19,23 @@ export default function Home() {
       if (typeof content === 'string') {
         transcript = content;
       } else {
-        // Transcribe audio
-        const formData = new FormData();
-        formData.append('file', content);
+        // Transcribe audio using chunked upload
+        const { uploadInChunks } = await import('@/lib/uploader');
+        const uploadId = await uploadInChunks(content, (p) => {
+          console.log(`Upload progress: ${p}%`);
+          // Note: In real app, we'd pass progress to UI state
+        });
         
         const transcribeRes = await fetch('/api/transcribe', {
           method: 'POST',
-          body: formData,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ uploadId }),
         });
 
-        if (!transcribeRes.ok) throw new Error('Transcription failed');
+        if (!transcribeRes.ok) {
+          const err = await transcribeRes.json();
+          throw new Error(err.error || 'Transcription failed');
+        }
         const transcribeData = await transcribeRes.json();
         transcript = transcribeData.text;
       }
