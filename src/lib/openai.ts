@@ -1,9 +1,11 @@
 import OpenAI from 'openai';
 
-if (!process.env.OPENAI_API_KEY) {
-  console.warn('OPENAI_API_KEY is not defined');
+export const hasApiKey = !!process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'your_openai_api_key_here';
+
+if (!hasApiKey) {
+  console.warn('⚠️ MeetMind AI: OPENAI_API_KEY is not defined. Falling back to MOCK MODE.');
 }
 
 export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
+  apiKey: hasApiKey ? process.env.OPENAI_API_KEY : 'mock-key',
 });

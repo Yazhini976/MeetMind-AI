@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { openai } from '@/lib/openai';
+import { openai, hasApiKey } from '@/lib/openai';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
+import { randomUUID } from 'node:crypto';
 
 export async function POST(req: NextRequest) {
+  if (!hasApiKey) {
+    return NextResponse.json({ uploadId: 'MOCK_DEMO_ID' });
+  }
   try {
     const demoScript = `
       Sarah: Hi John, I've looked at the product launch timeline. We need to finalize the slides by next Monday.
@@ -21,7 +25,7 @@ export async function POST(req: NextRequest) {
     });
 
     const buffer = Buffer.from(await mp3.arrayBuffer());
-    const uploadId = crypto.randomUUID();
+    const uploadId = randomUUID();
     const uploadDir = join(tmpdir(), 'meetmind_uploads');
     
     await mkdir(uploadDir, { recursive: true });

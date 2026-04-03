@@ -1,8 +1,17 @@
 'use client';
-import React from 'react';
-import { Brain, Settings, Github } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Brain, Settings, Github, AlertTriangle, CheckCircle2 } from 'lucide-react';
 
 export default function Header() {
+  const [hasApiKey, setHasApiKey] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    fetch('/api/status')
+      .then(res => res.json())
+      .then(data => setHasApiKey(data.hasApiKey))
+      .catch(() => setHasApiKey(false));
+  }, []);
+
   return (
     <header className="glass" style={{
       margin: '1rem',
@@ -28,7 +37,19 @@ export default function Header() {
           <Brain size={24} color="white" />
         </div>
         <div>
-          <h1 style={{ fontSize: '1.25rem', lineHeight: '1' }}>MeetMind <span className="gradient-text">AI</span></h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <h1 style={{ fontSize: '1.25rem', lineHeight: '1' }}>MeetMind <span className="gradient-text">AI</span></h1>
+            {hasApiKey === false && (
+              <span className="badge badge-teal" style={{ background: 'rgba(244, 114, 182, 0.2)', color: 'var(--accent)', fontSize: '0.65rem' }}>
+                <AlertTriangle size={10} style={{ marginRight: '4px' }} /> MOCK MODE
+              </span>
+            )}
+            {hasApiKey === true && (
+              <span className="badge badge-teal" style={{ fontSize: '0.65rem' }}>
+                <CheckCircle2 size={10} style={{ marginRight: '4px' }} /> API READY
+              </span>
+            )}
+          </div>
           <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Smart Meeting Intelligence</p>
         </div>
       </div>

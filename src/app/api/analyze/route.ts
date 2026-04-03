@@ -1,9 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { openai } from '@/lib/openai';
+import { openai, hasApiKey } from '@/lib/openai';
 
 export async function POST(req: NextRequest) {
   try {
     const { text } = await req.json();
+
+    if (!hasApiKey) {
+      // Mock Data for Demo purposes
+      return NextResponse.json({
+        "summary": "This is a MOCK SUMMARY (API KEY MISSING). Discussion about upcoming product launch.",
+        "keyPoints": [
+          "Launch planned next week",
+          "Sarah to handle slides",
+          "John to manage marketing"
+        ],
+        "actionItems": [
+          { "task": "Prepare slides", "assignedTo": "Sarah", "deadline": "Monday" },
+          { "task": "Marketing plan", "assignedTo": "John", "deadline": "Wednesday" }
+        ],
+        "speakers": [
+          { "name": "Sarah", "content": "We need to launch by Monday." },
+          { "name": "John", "content": "I'll handle the marketing strategy." }
+        ],
+        "isMock": true
+      });
+    }
 
     if (!text) {
       return NextResponse.json({ error: 'No text provided' }, { status: 400 });

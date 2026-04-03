@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { openai } from '@/lib/openai';
+import { openai, hasApiKey } from '@/lib/openai';
 import { unlink, mkdir, access } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
@@ -19,6 +19,11 @@ if (ffprobeInstaller) {
 const CHUNK_DURATION = 600; // 10 minutes in seconds
 
 export async function POST(req: NextRequest) {
+  if (!hasApiKey) {
+    return NextResponse.json({ 
+      text: "This is a MOCK TRANSCRIPT because the OpenAI API Key is missing. Sarah: We need to launch by Monday. John: I'll handle the marketing strategy." 
+    });
+  }
   const uploadDir = join(tmpdir(), 'meetmind_uploads');
   let tempFiles: string[] = [];
 
