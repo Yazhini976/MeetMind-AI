@@ -5,11 +5,15 @@ import { join } from 'path';
 import { tmpdir } from 'os';
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegInstaller from 'ffmpeg-static';
+import ffprobeInstaller from 'ffprobe-static';
 import fs from 'fs';
 
-// Configure ffmpeg path
+// Configure ffmpeg and ffprobe paths
 if (ffmpegInstaller) {
   ffmpeg.setFfmpegPath(ffmpegInstaller);
+}
+if (ffprobeInstaller) {
+  ffmpeg.setFfprobePath(ffprobeInstaller.path);
 }
 
 const CHUNK_DURATION = 600; // 10 minutes in seconds

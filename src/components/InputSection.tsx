@@ -51,54 +51,74 @@ export default function InputSection({ onProcess, isLoading }: InputSectionProps
       </div>
 
       {activeTab === 'upload' ? (
-        <div 
-          onClick={handleUploadClick}
-          style={{
-            border: '2px dashed var(--glass-border)',
-            borderRadius: '1rem',
-            padding: '3rem',
-            textAlign: 'center',
-            cursor: 'pointer',
-            transition: 'border-color 0.2s',
-            background: 'rgba(15, 23, 42, 0.2)',
-            position: 'relative'
-          }}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => {
-            e.preventDefault();
-            if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
-          }}
-        >
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleFileChange} 
-            style={{ display: 'none' }} 
-            accept="audio/*" 
-          />
-          {file ? (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-              <Mic size={48} color="var(--primary)" />
-              <div>
-                <p style={{ fontWeight: 600 }}>{file.name}</p>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+        <div style={{ position: 'relative' }}>
+          <div 
+            onClick={handleUploadClick}
+            style={{
+              border: '2px dashed var(--glass-border)',
+              borderRadius: '1rem',
+              padding: '3rem',
+              textAlign: 'center',
+              cursor: 'pointer',
+              transition: 'border-color 0.2s',
+              background: 'rgba(15, 23, 42, 0.2)',
+            }}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+            }}
+          >
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileChange} 
+              style={{ display: 'none' }} 
+              accept="audio/*" 
+            />
+            {file ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                <Mic size={48} color="var(--primary)" />
+                <div>
+                  <p style={{ fontWeight: 600 }}>{file.name}</p>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                </div>
+                <button 
+                  onClick={(e) => { e.stopPropagation(); setFile(null); }} 
+                  className="btn-secondary" 
+                  style={{ padding: '0.25rem', borderRadius: '50%' }}
+                >
+                  <X size={16} />
+                </button>
               </div>
+            ) : (
+              <>
+                <div style={{ marginBottom: '1rem', color: 'var(--text-muted)' }}>
+                  <Upload size={48} />
+                </div>
+                <p style={{ fontSize: '1.1rem', fontWeight: 500 }}>Click or drag audio file here</p>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>MP3, WAV, M4A up to 500MB</p>
+              </>
+            )}
+          </div>
+          
+          {!file && !isLoading && (
+            <div style={{
+              position: 'absolute',
+              bottom: '1rem',
+              right: '1rem'
+            }}>
               <button 
-                onClick={(e) => { e.stopPropagation(); setFile(null); }} 
-                className="btn-secondary" 
-                style={{ padding: '0.25rem', borderRadius: '50%' }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onProcess('DEMO_SAMPLE');
+                }}
+                className="btn btn-secondary"
+                style={{ fontSize: '0.8rem', padding: '0.4rem 0.8rem' }}
               >
-                <X size={16} />
+                <Mic size={14} style={{ marginRight: '4px' }} /> Try a Demo
               </button>
             </div>
-          ) : (
-            <>
-              <div style={{ marginBottom: '1rem', color: 'var(--text-muted)' }}>
-                <Upload size={48} />
-              </div>
-              <p style={{ fontSize: '1.1rem', fontWeight: 500 }}>Click or drag audio file here</p>
-              <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>MP3, WAV, M4A up to 500MB</p>
-            </>
           )}
         </div>
       ) : (

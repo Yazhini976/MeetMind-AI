@@ -17,7 +17,24 @@ export default function Home() {
       let transcript = '';
 
       if (typeof content === 'string') {
-        transcript = content;
+        if (content === 'DEMO_SAMPLE') {
+          // Generate a synthetic sample
+          const genRes = await fetch('/api/generate-sample', { method: 'POST' });
+          if (!genRes.ok) throw new Error('Failed to generate sample');
+          const { uploadId } = await genRes.json();
+          
+          const transcribeRes = await fetch('/api/transcribe', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ uploadId }),
+          });
+
+          if (!transcribeRes.ok) throw new Error('Transcription of sample failed');
+          const transcribeData = await transcribeRes.json();
+          transcript = transcribeData.text;
+        } else {
+          transcript = content;
+        }
       } else {
         // Transcribe audio using chunked upload
         const { uploadInChunks } = await import('@/lib/uploader');
