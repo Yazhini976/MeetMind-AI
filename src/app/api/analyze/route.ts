@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { openai, hasApiKey } from '@/lib/openai';
+import { getOpenAIClient } from '@/lib/openai';
 
 export async function POST(req: NextRequest) {
   try {
+    const customKey = req.headers.get('x-openai-key');
+    const { client, isMock } = getOpenAIClient(customKey);
     const { text } = await req.json();
 
-    if (!hasApiKey) {
+    if (isMock) {
       // Mock Data for Demo purposes
       return NextResponse.json({
         "summary": "This is a MOCK SUMMARY (API KEY MISSING). Discussion about upcoming product launch.",
@@ -50,7 +52,7 @@ export async function POST(req: NextRequest) {
       Ensure action items are very specific.
     `;
 
-    const response = await openai.chat.completions.create({
+    const response = await client.chat.completions.create({
       model: 'gpt-4o',
       messages: [{ role: 'user', content: prompt }],
       response_format: { type: 'json_object' },

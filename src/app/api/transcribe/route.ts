@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { openai, hasApiKey } from '@/lib/openai';
+import { getOpenAIClient } from '@/lib/openai';
 import { unlink, mkdir, access } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
@@ -19,7 +19,10 @@ if (ffprobeInstaller) {
 const CHUNK_DURATION = 600; // 10 minutes in seconds
 
 export async function POST(req: NextRequest) {
-  if (!hasApiKey) {
+  const customKey = req.headers.get('x-openai-key');
+  const { client, isMock } = getOpenAIClient(customKey);
+
+  if (isMock) {
     return NextResponse.json({ 
       text: "This is a MOCK TRANSCRIPT because the OpenAI API Key is missing. Sarah: We need to launch by Monday. John: I'll handle the marketing strategy." 
     });
@@ -57,7 +60,7 @@ export async function POST(req: NextRequest) {
 
     if (duration <= CHUNK_DURATION) {
       // Small file, process directly
-      const transcription = await openai.audio.transcriptions.create({
+      const transcription = await client.audio.transcriptions.create({
         file: fs.createReadStream(fullFilePath),
         model: 'whisper-1',
       });
@@ -81,7 +84,7 @@ export async function POST(req: NextRequest) {
             .save(chunkPath);
         });
 
-        const transcription = await openai.audio.transcriptions.create({
+        const transcription = await client.audio.transcriptions.create({
           file: fs.createReadStream(chunkPath),
           model: 'whisper-1',
         });

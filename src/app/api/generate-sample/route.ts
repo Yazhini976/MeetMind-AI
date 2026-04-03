@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { openai, hasApiKey } from '@/lib/openai';
+import { getOpenAIClient } from '@/lib/openai';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { tmpdir } from 'os';
 import { randomUUID } from 'node:crypto';
 
 export async function POST(req: NextRequest) {
-  if (!hasApiKey) {
+  const customKey = req.headers.get('x-openai-key');
+  const { client, isMock } = getOpenAIClient(customKey);
+
+  if (isMock) {
     return NextResponse.json({ uploadId: 'MOCK_DEMO_ID' });
   }
   try {
@@ -18,7 +21,7 @@ export async function POST(req: NextRequest) {
     `;
 
     // Generate speech using OpenAI TTS
-    const mp3 = await openai.audio.speech.create({
+    const mp3 = await client.audio.speech.create({
       model: 'tts-1',
       voice: 'nova',
       input: demoScript,

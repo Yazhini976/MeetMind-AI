@@ -14,18 +14,26 @@ export default function Home() {
     setResult(null);
 
     try {
+      const getHeaders = (base: any = {}) => {
+        const savedKey = localStorage.getItem('meetmind_openai_key');
+        return savedKey ? { ...base, 'x-openai-key': savedKey } : base;
+      };
+
       let transcript = '';
 
       if (typeof content === 'string') {
         if (content === 'DEMO_SAMPLE') {
           // Generate a synthetic sample
-          const genRes = await fetch('/api/generate-sample', { method: 'POST' });
+          const genRes = await fetch('/api/generate-sample', { 
+            method: 'POST',
+            headers: getHeaders()
+          });
           if (!genRes.ok) throw new Error('Failed to generate sample');
           const { uploadId } = await genRes.json();
           
           const transcribeRes = await fetch('/api/transcribe', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getHeaders({ 'Content-Type': 'application/json' }),
             body: JSON.stringify({ uploadId }),
           });
 
@@ -40,12 +48,11 @@ export default function Home() {
         const { uploadInChunks } = await import('@/lib/uploader');
         const uploadId = await uploadInChunks(content, (p) => {
           console.log(`Upload progress: ${p}%`);
-          // Note: In real app, we'd pass progress to UI state
         });
         
         const transcribeRes = await fetch('/api/transcribe', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: getHeaders({ 'Content-Type': 'application/json' }),
           body: JSON.stringify({ uploadId }),
         });
 
@@ -60,7 +67,7 @@ export default function Home() {
       // Analyze transcript
       const analyzeRes = await fetch('/api/analyze', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getHeaders({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ text: transcript }),
       });
 
